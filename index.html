@@ -3,27 +3,39 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=600, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="viewport"
+          content="width=600, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible"
+          content="ie=edge">
     <title>Clicker game</title>
-    <script src="https://vuejs.org/js/vue.min.js"></script>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300italic,700,700italic">
-    <link rel="stylesheet" href="https://cdn.rawgit.com/necolas/normalize.css/master/normalize.css">
-    <link rel="stylesheet" href="https://cdn.rawgit.com/milligram/milligram/master/dist/milligram.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.13/vue.min.js"></script>
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css?family=Roboto:300,300italic,700,700italic">
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css">
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/milligram/1.3.0/milligram.min.css">
 </head>
 
 <body>
-    <div class="container" id="clicker">
+    <div class="container"
+         id="clicker">
         <h1>Clicks: {{ Math.round(game.clicks) }}</h1>
         <h4>{{ Math.round(game.cps) }} clicks/s</h4>
         <button @click="game.click()"> {{ game.click_value }} clicks </button>
-        <button class="button-outline" @click="game.buy(game.buyables.click_bonus)" :disabled="!(game.buyables.click_bonus.enabled && game.clicks>=game.buyables.click_bonus.price)">
+        <button class="button-outline"
+                @click="game.buy(game.buyables.click_bonus)"
+                :disabled="!(game.buyables.click_bonus.enabled && game.clicks>=game.buyables.click_bonus.price)">
             +1 click({{ game.buyables.click_bonus.bought }}): {{ Math.ceil(game.buyables.click_bonus.price) }}
         </button>
-        <button class="button-outline" @click="game.buy(game.buyables.auto_clicker1)" :disabled="!(game.buyables.auto_clicker1.enabled && game.clicks>=game.buyables.auto_clicker1.price)">
+        <button class="button-outline"
+                @click="game.buy(game.buyables.auto_clicker1)"
+                :disabled="!(game.buyables.auto_clicker1.enabled && game.clicks>=game.buyables.auto_clicker1.price)">
             +1 cps({{ game.buyables.auto_clicker1.bought }}): {{ Math.ceil(game.buyables.auto_clicker1.price) }}
         </button>
-        <button class="button-outline" @click="game.buy(game.buyables.auto_clicker10)" :disabled="!(game.buyables.auto_clicker10.enabled && game.clicks>=game.buyables.auto_clicker10.price)">
+        <button class="button-outline"
+                @click="game.buy(game.buyables.auto_clicker10)"
+                :disabled="!(game.buyables.auto_clicker10.enabled && game.clicks>=game.buyables.auto_clicker10.price)">
             +10 cps({{ game.buyables.auto_clicker10.bought }}): {{ Math.ceil(game.buyables.auto_clicker10.price) }}
         </button>
     </div>
@@ -93,7 +105,7 @@
             }
             update(frame) {
                 let increment = this.cps * (frame - this.last_frame) / 1000;
-                if(Number(increment)>0){
+                if (Number(increment) > 0) {
                     this.clicks += increment;
                 }
                 this.last_frame = frame;
