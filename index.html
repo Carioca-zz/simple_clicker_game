@@ -105,7 +105,10 @@
                 delete save_game.stopCode;
                 save_game.buyables = {};
                 for (let buyable in this.buyables) {
-                    save_game.buyables[buyable] = { bought: this.buyables[buyable].bought }
+                    save_game.buyables[buyable] = { 
+                        bought: this.buyables[buyable].bought,
+                        price: this.buyables[buyable].price,
+                    }
                 }
                 window.localStorage.setItem('save', JSON.stringify(save_game));
             }
@@ -117,6 +120,7 @@
                 this.click_value = save_game.click_value;
                 for(let buyable in save_game.buyables){
                     this.buyables[buyable].bought = save_game.buyables[buyable].bought;
+                    this.buyables[buyable].price = save_game.buyables[buyable].price;
                 }
             }
         }
