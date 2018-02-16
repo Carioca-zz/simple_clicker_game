@@ -15,12 +15,16 @@
 <body>
     <div class="container" id="clicker">
         <h1>Clicks: {{ Math.round(game.clicks) }}</h1>
+        <h4>{{ Math.round(game.cps) }} clicks/s</h4>
         <button @click="game.click()"> {{ game.click_value }} clicks </button>
         <button class="button-outline" @click="game.buy(game.buyables.click_bonus)" :disabled="!(game.buyables.click_bonus.enabled && game.clicks>=game.buyables.click_bonus.price)">
             +1 click({{ game.buyables.click_bonus.bought }}): {{ Math.ceil(game.buyables.click_bonus.price) }}
         </button>
-        <button class="button-outline" @click="game.buy(game.buyables.auto_clicker)" :disabled="!(game.buyables.auto_clicker.enabled && game.clicks>=game.buyables.auto_clicker.price)">
-            +1 cps({{ game.buyables.auto_clicker.bought }}): {{ Math.ceil(game.buyables.auto_clicker.price) }}
+        <button class="button-outline" @click="game.buy(game.buyables.auto_clicker1)" :disabled="!(game.buyables.auto_clicker1.enabled && game.clicks>=game.buyables.auto_clicker1.price)">
+            +1 cps({{ game.buyables.auto_clicker1.bought }}): {{ Math.ceil(game.buyables.auto_clicker1.price) }}
+        </button>
+        <button class="button-outline" @click="game.buy(game.buyables.auto_clicker10)" :disabled="!(game.buyables.auto_clicker10.enabled && game.clicks>=game.buyables.auto_clicker10.price)">
+            +10 cps({{ game.buyables.auto_clicker10.bought }}): {{ Math.ceil(game.buyables.auto_clicker10.price) }}
         </button>
     </div>
     <script>
@@ -71,7 +75,9 @@
                 this.last_frame = 0;
                 this.buyables = {
                     click_bonus: new ClickBonus('bonus clicks', 1, 1.1, 1),
-                    auto_clicker: new AutoClicker('auto clicker', 10, 1.1, 1),
+                    auto_clicker1: new AutoClicker('auto clicker', 10, 1.1, 1),
+                    auto_clicker10: new AutoClicker('auto clicker', 200, 1.1, 10),
+                    auto_clicker100: new AutoClicker('auto clicker', 4000, 1.1, 100),
                 };
             }
             buy(buyable) {
