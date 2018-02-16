@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=600, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Clicker game</title>
+    <script src="https://vuejs.org/js/vue.js"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300italic,700,700italic">
+    <link rel="stylesheet" href="https://cdn.rawgit.com/necolas/normalize.css/master/normalize.css">
+    <link rel="stylesheet" href="https://cdn.rawgit.com/milligram/milligram/master/dist/milligram.min.css">
+</head>
+
+<body>
+    <div class="container" id="clicker">
+        <h1>Clicks: {{ Math.round(game.clicks) }}</h1>
+        <button @click="game.click()"> {{ game.click_value }} clicks </button>
+        <button class="button-outline" @click="game.buy(game.buyables.click_bonus)" :disabled="!(game.buyables.click_bonus.enabled && game.clicks>=game.buyables.click_bonus.price)">
+            +1 click({{ game.buyables.click_bonus.bought }}): {{ Math.ceil(game.buyables.click_bonus.price) }}
+        </button>
+        <button class="button-outline" @click="game.buy(game.buyables.auto_clicker)" :disabled="!(game.buyables.auto_clicker.enabled && game.clicks>=game.buyables.auto_clicker.price)">
+            +1 cps({{ game.buyables.auto_clicker.bought }}): {{ Math.ceil(game.buyables.auto_clicker.price) }}
+        </button>
+    </div>
+    <script>
+        class Buyable {
+            constructor(name, price, price_increase) {
+                this.name = name;
+                this.price = price;
+                this.price_increase = price_increase;
+                this.bought = 0;
+                this.enabled = Boolean(price);
+            }
+            onBuy(game) {
+                this.bought += 1;
+                if (Boolean(this.price_increase)) {
+                    this.price *= this.price_increase;
+                } else {
+                    this.enabled = false
+                }
+            }
+        }
+        class ClickBonus extends Buyable {
+            constructor(name, price, price_increase, click_bonus) {
+                super(name, price, price_increase);
+                this.click_bonus = click_bonus;
+            }
+            onBuy(game) {
+                super.onBuy(game);
+                game.click_value += this.click_bonus;
+            }
+        }
+
+        class AutoClicker extends Buyable {
+            constructor(name, price, price_increase, cps) {
+                super(name, price, price_increase);
+                this.cps = cps;
+            }
+            onBuy(game) {
+                super.onBuy(game);
+                game.cps += this.cps;
+            }
+        }
+
+        class Game {
+            constructor() {
+                this.clicks = 0;
+                this.click_value = 1;
+                this.cps = 0; // Clicks per second
+                this.last_frame = 0;
+                this.buyables = {
+                    click_bonus: new ClickBonus('bonus clicks', 1, 1.1, 1),
+                    auto_clicker: new AutoClicker('auto clicker', 10, 1.1, 1),
+                };
+            }
+            buy(buyable) {
+                if (this.clicks >= buyable.price) {
+                    this.clicks -= buyable.price;
+                    buyable.onBuy(this);
+                    return true;
+                }
+                return false;
+            }
+            click() {
+                this.clicks += this.click_value;
+            }
+            update(frame) {
+                let increment = this.cps * (frame - this.last_frame) / 1000;
+                if(Number(increment)>0){
+                    this.clicks += increment;
+                }
+                this.last_frame = frame;
+            }
+        }
+
+        var game = new Game;
+
+        var clicker = new Vue({
+            el: '#clicker',
+            data: {
+                game: game,
+            },
+        });
+        (function () {
+            function main(frame) {
+                game.stopCode = window.requestAnimationFrame(main);
+
+                game.update(frame);
+                // console.log(tFrame)
+            }
+
+            main(); // Start the cycle
+        })();
+    </script>
+</body>
+
+</html>
