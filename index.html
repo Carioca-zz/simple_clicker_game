@@ -111,6 +111,7 @@
             }
             load(){
                 let save_game = JSON.parse(window.localStorage.getItem('save'));
+                if(save_game === null){return}
                 this.clicks = save_game.clicks;
                 this.cps = save_game.cps;
                 this.click_value = save_game.click_value;
