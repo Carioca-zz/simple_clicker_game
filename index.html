@@ -23,21 +23,12 @@
         <h1>Clicks: {{ Math.round(game.clicks) }}</h1>
         <h4>{{ Math.round(game.cps) }} clicks/s</h4>
         <button @click="game.click()"> {{ game.click_value }} clicks </button>
-        <buyable-item v-bind:buyable="game.buyables.click_bonus" ></buyable-item>
-        <buyable-item v-bind:buyable="game.buyables.auto_clicker1" ></buyable-item>
-        <buyable-item v-bind:buyable="game.buyables.auto_clicker10" ></buyable-item>
-        <buyable-item v-bind:buyable="game.buyables.auto_clicker100" ></buyable-item>
+        <buyable-item v-bind:buyable="game.buyables.click_bonus"></buyable-item>
+        <buyable-item v-bind:buyable="game.buyables.auto_clicker1"></buyable-item>
+        <buyable-item v-bind:buyable="game.buyables.auto_clicker10"></buyable-item>
+        <buyable-item v-bind:buyable="game.buyables.auto_clicker100"></buyable-item>
     </div>
     <script>
-        Vue.component('buyable-item', {
-            props: ['buyable'],
-            template:
-                `<button class="button-outline"
-                         @click="game.buy(buyable)"
-                         :disabled="!(buyable.enabled && game.clicks>=buyable.price)">
-                    {{buyable.name}}({{ buyable.bought }}): {{ Math.ceil(buyable.price) }}
-                </button>`,
-        })
         class Buyable {
             constructor(name, price, price_increase) {
                 this.name = name;
@@ -108,9 +99,39 @@
                 }
                 this.last_frame = frame;
             }
+            save() {
+                let save_game = Object.assign({}, this);
+                delete save_game.last_frame;
+                delete save_game.stopCode;
+                save_game.buyables = {};
+                for (let buyable in this.buyables) {
+                    save_game.buyables[buyable] = { bought: this.buyables[buyable].bought }
+                }
+                window.localStorage.setItem('save', JSON.stringify(save_game));
+            }
+            load(){
+                let save_game = JSON.parse(window.localStorage.getItem('save'));
+                this.clicks = save_game.clicks;
+                this.cps = save_game.cps;
+                this.click_value = save_game.click_value;
+                for(let buyable in save_game.buyables){
+                    this.buyables[buyable].bought = save_game.buyables[buyable].bought;
+                }
+            }
         }
 
         var game = new Game;
+        game.load();
+
+        Vue.component('buyable-item', {
+            props: ['buyable'],
+            template:
+                `<button class="button-outline"
+                         @click="game.buy(buyable)"
+                         :disabled="!(buyable.enabled && game.clicks>=buyable.price)">
+                    {{buyable.name}}({{ buyable.bought }}): {{ Math.ceil(buyable.price) }}
+                </button>`,
+        })
 
         var clicker = new Vue({
             el: '#clicker',
@@ -118,12 +139,13 @@
                 game: game,
             },
         });
+
         (function () {
             function main(frame) {
                 game.stopCode = window.requestAnimationFrame(main);
 
                 game.update(frame);
-                // console.log(tFrame)
+                game.save();
             }
 
             main(); // Start the cycle
